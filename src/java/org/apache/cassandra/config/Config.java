@@ -83,4 +83,5 @@ public class Config {
         standard,
     }
     
+    public List<String> plugins;
 }

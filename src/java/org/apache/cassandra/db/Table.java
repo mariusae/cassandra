@@ -329,9 +329,14 @@ public class Table
      * Once this happens the data associated with the individual column families
      * is also written to the column family store's memtable.
     */
+
+    // mae: this is where we receive the row mutation.
+
     public void apply(RowMutation mutation, Object serializedMutation, boolean writeCommitLog) throws IOException
     {
         HashMap<ColumnFamilyStore,Memtable> memtablesToFlush = new HashMap<ColumnFamilyStore, Memtable>(2);
+
+        Runnable afterMutate = DatabaseDescriptor.getPluginManager().beforeMutate(this, mutation);
 
         // write the mutation to the commitlog and memtables
         flusherLock.readLock().lock();
@@ -370,6 +375,11 @@ public class Table
         // flush memtables that got filled up.  usually mTF will be empty and this will be a no-op
         for (Map.Entry<ColumnFamilyStore, Memtable> entry : memtablesToFlush.entrySet())
             entry.getKey().maybeSwitchMemtable(entry.getValue(), writeCommitLog);
+
+        // TODO: figure out threadpool policies around expensive
+        // plugin ops (probably to be delegated to plugin manager).
+        if (afterMutate != null)
+            afterMutate.run();
     }
 
     public List<Future<?>> flush() throws IOException

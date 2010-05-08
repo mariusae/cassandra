@@ -32,6 +32,8 @@ import org.apache.cassandra.locator.AbstractReplicationStrategy;
 import org.apache.cassandra.io.util.FileUtils;
 import org.apache.cassandra.service.StorageService;
 import org.apache.cassandra.utils.FBUtilities;
+import org.apache.cassandra.plugin.Plugin;
+import org.apache.cassandra.plugin.PluginManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.cassandra.locator.IEndpointSnitch;
@@ -59,6 +61,8 @@ public class DatabaseDescriptor
 
     public static final String random = "RANDOM";
     public static final String ophf = "OPHF";
+    public static final PluginManager pluginManager = new PluginManager();
+
     private static IEndpointSnitch snitch;
     private static InetAddress listenAddress; // leave null so we can fall through to getLocalHost
     private static InetAddress rpcAddress;
@@ -297,6 +301,12 @@ public class DatabaseDescriptor
             {
                 seeds.add(InetAddress.getByName(conf.seeds[i]));
             }
+
+            if (conf.plugins != null)
+            {
+                for (String pluginClass : conf.plugins)
+                    pluginManager.addClass(pluginClass);
+            }
         }
         catch (ConfigurationException e)
         {
@@ -402,8 +412,7 @@ public class DatabaseDescriptor
     public static Collection<KSMetaData> readTablesFromYaml() throws ConfigurationException
     {
         List<KSMetaData> defs = new ArrayList<KSMetaData>();
-        
-        
+
         /* Read the table related stuff from config */
         for (Keyspace keyspace : conf.keyspaces)
         {
@@ -937,5 +946,10 @@ public class DatabaseDescriptor
     public static boolean hintedHandoffEnabled()
     {
         return conf.hinted_handoff_enabled;
+    }
+
+    public static PluginManager getPluginManager()
+    {
+        return pluginManager;
     }
 }
