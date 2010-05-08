@@ -1,0 +1,6 @@
+.gitignore
+*.class
+build/*
+gen-java
+junit*properties
+TAGS
