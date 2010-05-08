@@ -336,7 +336,11 @@ public class Table
     {
         HashMap<ColumnFamilyStore,Memtable> memtablesToFlush = new HashMap<ColumnFamilyStore, Memtable>(2);
 
-        Runnable afterMutate = DatabaseDescriptor.getPluginManager().beforeMutate(this, mutation);
+        Runnable afterMutate = null;
+        if (!name.equals(SYSTEM_TABLE)) 
+        {
+            afterMutate = DatabaseDescriptor.getPluginManager().beforeMutate(this, mutation);
+        }
 
         // write the mutation to the commitlog and memtables
         flusherLock.readLock().lock();
