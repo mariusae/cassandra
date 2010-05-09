@@ -4,3 +4,4 @@ build/*
 gen-java
 junit*properties
 TAGS
+var/*
