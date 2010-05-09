@@ -19,14 +19,14 @@
 package org.apache.cassandra.plugin;
 
 import java.util.List;
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 import org.apache.cassandra.db.Table;
 import org.apache.cassandra.db.RowMutation;
 
 public class PluginManager implements Plugin
 {
-    List<Plugin> plugins = new ArrayList<Plugin>();
+    List<Plugin> plugins = new LinkedList<Plugin>();
 
     /*
      * Add the given instance to the list of managed plugins. After
@@ -65,7 +65,7 @@ public class PluginManager implements Plugin
 
     public Runnable beforeMutate(Table table, RowMutation mutation)
     {
-        final List<Runnable> afterMutates = new ArrayList<Runnable>();
+        final List<Runnable> afterMutates = new LinkedList<Runnable>();
 
         for (Plugin plugin : plugins)
         {

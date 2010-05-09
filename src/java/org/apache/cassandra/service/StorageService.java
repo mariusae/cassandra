@@ -1560,6 +1560,11 @@ public class StorageService implements IEndpointStateChangeSubscriber, StorageSe
         return operationMode;
     }
     
+    public boolean isInitialized()
+    {
+        return initialized;
+    }
+
     /** shuts node off to writes, empties memtables and the commit log. */
     public synchronized void drain() throws IOException, InterruptedException, ExecutionException
     {
